@@ -50,3 +50,4 @@ npm run build
 7. Deploy.
 
 The prototype uses external Unsplash image URLs and browser camera access for QR scanning. Camera access requires HTTPS or localhost.
+# DesignVillaCheck3
