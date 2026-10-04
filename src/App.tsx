@@ -91,19 +91,22 @@ function Badge({ pending = false, children = "ตรวจสอบข้อม�
 function Header({ page, go }: { page: Page; go: (page: Page) => void }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = (next: Page) => { setMobileMenuOpen(false); go(next); };
+  useEffect(() => { setMobileMenuOpen(false); }, [page]);
+  useEffect(() => { const close = (event: KeyboardEvent) => { if (event.key === "Escape") setMobileMenuOpen(false); }; window.addEventListener("keydown", close); return () => window.removeEventListener("keydown", close); }, []);
   return <header className="v3-nav-shell">
     <div className="v3-nav container">
       <button className="v3-brand" onClick={() => navigate("home")}><Logo /></button>
-      <nav className={mobileMenuOpen ? "open" : ""}>
+      <nav id="public-mobile-menu" aria-label="เมนูหลัก" className={mobileMenuOpen ? "open" : ""}>
         <button onClick={() => navigate("directory")}>Explore</button>
         <button onClick={() => navigate("scan")}>Check QR</button>
         <button onClick={() => navigate("pricing")}>For owners</button>
         <button onClick={() => navigate("villa-report")}>Report</button>
+        <button className="mobile-login-link" onClick={() => navigate("login")}>เข้าสู่ระบบ</button>
       </nav>
       <div className="v3-nav-actions">
         <button className="v3-login" onClick={() => navigate("login")}>เข้าสู่ระบบ</button>
-        <button className="v3-scan-cta" onClick={() => navigate("scan")}><Icon name="qr" size={17}/> ตรวจสอบก่อนโอน</button>
-        <button className="mobile-menu-button" onClick={() => setMobileMenuOpen(v => !v)} aria-label="เมนู"><Icon name={mobileMenuOpen ? "close" : "menu"}/></button>
+        <button className="v3-scan-cta" onClick={() => navigate("scan")}><Icon name="qr" size={17}/><span>ตรวจสอบก่อนโอน</span></button>
+        <button className="mobile-menu-button" onClick={() => setMobileMenuOpen(v => !v)} aria-label={mobileMenuOpen ? "ปิดเมนู" : "เปิดเมนู"} aria-expanded={mobileMenuOpen} aria-controls="public-mobile-menu"><Icon name={mobileMenuOpen ? "close" : "menu"}/></button>
       </div>
     </div>
   </header>;
@@ -529,11 +532,20 @@ const plans = [
 function Pricing({ onSelect, go }: { onSelect: (name: string) => void; go: (page: Page) => void }) {
   const [active, setActive] = useState(2);
   const plan = plans[active];
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const tabs = tabsRef.current;
+    const selected = tabs?.querySelector<HTMLButtonElement>("button.active");
+    if (tabs && selected && window.matchMedia("(max-width: 900px)").matches) {
+      const left = tabs.scrollLeft + selected.getBoundingClientRect().left - tabs.getBoundingClientRect().left - (tabs.clientWidth - selected.offsetWidth) / 2;
+      tabs.scrollTo({ left, behavior: "auto" });
+    }
+  }, [active]);
   return <main className="v3-pricing">
     <section className="container v3-pricing-head"><span className="v3-overline dark">OWNER MEMBERSHIP</span><h1>เลือกแพ็กเกจด้วยรายละเอียด<br/>ไม่ใช่กล่อง 5 ใบเรียงกัน</h1><p>Prototype ยังไม่มีระบบชำระเงินจริง หลังยืนยันจะเข้าสถานะ Pending</p></section>
     <section className="container v3-pricing-selector">
-      <div className="v3-plan-tabs">{plans.map((p,i)=><button key={p.name} onClick={()=>setActive(i)} className={active===i?'active':''}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{p.name}</strong><small>{p.price} {p.unit}</small></div><Icon name="arrow" size={18}/></button>)}</div>
-      <div className="v3-plan-detail">
+      <div className="v3-plan-tabs" ref={tabsRef} aria-label="เลือกแพ็กเกจ">{plans.map((p,i)=><button key={p.name} onClick={()=>setActive(i)} aria-pressed={active===i} className={active===i?'active':''}><span>{String(i+1).padStart(2,'0')}</span><div><strong>{p.name}</strong><small>{p.price} {p.unit}</small></div><Icon name="arrow" size={18}/></button>)}</div>
+      <div className="v3-plan-detail"><p className="mobile-plan-hint">← ปัดแถบด้านบนเพื่อดูแพ็กเกจทั้งหมด →</p>
         <div className="v3-plan-price"><span>{plan.name}</span><strong>{plan.price}</strong><small>{plan.unit}</small></div>
         <h2>{plan.desc}</h2>
         <ul>{plan.features.map(f=><li key={f}><Icon name="check" size={16}/>{f}</li>)}</ul>

@@ -50,7 +50,7 @@ VITE_INSTAGRAM_URL=https://...หน้าธุรกิจจริง...
 - ตรวจ render DOM จำลองผ่านทุก page state: V1 54 หน้า / V2 45 หน้า / V3 54 หน้า
 - ตรวจ flow ที่แก้ผ่าน 14 assertions เช่นเลือก Villa, Back/Forward, Pricing → Contact, Owner login → Select Villa, V2 เปลี่ยนแพ็กเกจและเปิด QR
 - ตรวจ JSX ไม่พบ button/Button ที่ไม่มี onClick หรือ submit และไม่พบ anchor placeholder ในไฟล์แอปที่ตรวจ
-- ไม่ได้ทดสอบกล้องจริงหรือ visual layout ในเบราว์เซอร์จริง เนื่องจาก runtime ไม่มี Chromium และดาวน์โหลดไม่สำเร็จ การทดสอบ DOM ไม่ยืนยันการจัดวางบนมือถือ
+- อัปเดต V3 Mobile: ตรวจ layout ใน Chromium แล้ว ดูผลล่าสุดใน MOBILE_UPDATE_TH.md; ยังไม่ทดสอบกล้องหรือมือถือเครื่องจริง
 - QR สาธิตที่รองรับยังเป็นรหัสใน source เดิม: V1/V3 VC-TH-2025-01842; V2 VC-PH-02481
 - Login/Owner/Admin/Reports/Package requests เป็น prototype และ state ใน frontend ไม่มี backend หรือฐานข้อมูลจริง ข้อมูลฟอร์มหลายหน้าจะไม่คงอยู่หลัง refresh
 - ที่พักอื่นใน V1/V3 แสดงข้อมูลจากการ์ดที่เลือก เช่นชื่อ จังหวัด รูป ผู้พักและสถานะ ไม่คัดลอกข้อมูลบัญชี/ผู้ติดต่อของ Sea Sky ไปใส่ที่พักอื่น

@@ -1,5 +1,5 @@
 import { openSupport } from "./support";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type Page =
   | "home" | "directory" | "detail" | "scan" | "verify" | "pricing" | "login"
@@ -264,12 +264,23 @@ const userNav: [string, Page][] = [
 
 function PortalShell({ role, page, go, children }: { role: "Owner" | "Admin" | "User"; page: Page; go: Go; children: React.ReactNode }) {
   const nav = role === "Owner" ? ownerNav : role === "Admin" ? adminNav : userNav;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = (target: Page) => { setMenuOpen(false); go(target); };
+  useEffect(() => { setMenuOpen(false); }, [page]);
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => { if (event.key === "Escape") setMenuOpen(false); };
+    window.addEventListener("keydown", close);
+    return () => window.removeEventListener("keydown", close);
+  }, []);
   return <main className="portal-page">
-    <aside className="portal-side">
-      <button className="portal-brand" onClick={() => go("home")}>Villa<span>Check</span></button>
+    <aside className={`portal-side ${menuOpen ? "portal-menu-open" : ""}`}>
+      <div className="portal-mobile-bar">
+        <button className="portal-brand" onClick={() => navigate("home")}>Villa<span>Check</span></button>
+        <button className="portal-menu-toggle" aria-expanded={menuOpen} aria-controls="portal-menu" onClick={() => setMenuOpen(value => !value)}>{menuOpen ? "ปิดเมนู ✕" : "เมนู ☰"}</button>
+      </div>
       <small>{role.toUpperCase()} PORTAL</small>
-      <nav>{nav.map(([label, target]) => <button key={target} className={page === target ? "active" : ""} onClick={() => go(target)}>{label}</button>)}</nav>
-      <button className="portal-logout" onClick={() => go("login")}>ออกจากระบบ</button>
+      <nav id="portal-menu" aria-label={`เมนู ${role}`}>{nav.map(([label, target]) => <button key={target} aria-current={page === target ? "page" : undefined} className={page === target ? "active" : ""} onClick={() => navigate(target)}>{label}</button>)}</nav>
+      <button className="portal-logout" onClick={() => navigate("login")}>ออกจากระบบ</button>
     </aside>
     <section className="portal-content">{children}</section>
   </main>;
